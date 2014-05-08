@@ -1,12 +1,29 @@
-Object.prototype.findKeyInTree = function (key) {
+Object.prototype.findKeyInTree = function (key, options) {
     var i,
         result,
         matches = [],
-        caseSensitive = arguments[1] === false ? false : true,
         isFinal = arguments[2] === false ? false : true;
 
+    options = options || {};
+
     for (i in this) {
-        if (caseSensitive ? i === key : i.toLowerCase() === key.toLowerCase()) {
+        var compare = [key, i];
+
+        if (options.conventionAgnostic === true) {
+            compare = compare.map(function(s) {
+                return s.replace(/(\_[a-zA-Z])/g, function(match) {
+                    return match.toUpperCase().replace('_','');
+                });
+            });
+        }
+
+        if (options.caseSensitive === false) {
+            compare = compare.map(function(s) {
+                return s.toLowerCase();
+            });
+        }
+
+        if (compare[0] === compare[1]) {
             if (isFinal) {
                 matches.push(i);
             } else {
@@ -15,7 +32,7 @@ Object.prototype.findKeyInTree = function (key) {
         }
 
         if (this[i].constructor === {}.constructor) {
-            result = this[i].findKeyInTree(key, caseSensitive, null);
+            result = this[i].findKeyInTree(key, options, null);
             if (result) {
                 if (isFinal) {
                     matches.push(i + '.' + result);
@@ -25,6 +42,7 @@ Object.prototype.findKeyInTree = function (key) {
             }
         }
     }
+
     if (isFinal) {
         if (matches.length > 1) {
             return matches;

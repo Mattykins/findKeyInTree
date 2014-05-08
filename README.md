@@ -7,10 +7,16 @@ returns the "path" to that key.
 Usage:
 ------
 
-Object.findKeyInTree takes two parameters: `key` and `caseSensitive`. `key` is
-the key you'd like to search the object for. `caseSensitive` is whether or not
-case should matter in your search. `caseSensitive` is optional, and defaults to
-true.
+Object.findKeyInTree takes two parameters: `key` and an `options` object. `key` is
+the key you'd like to search the object for. The `options` object has a couple of
+values such as `caseSensitive` and `conventionAgnostic`
+
+Default Options:
+------
+    {
+      caseSensitive: true,
+      conventionAgnostic: false
+    }
 
 Examples:
 ---------
@@ -24,19 +30,26 @@ For all the following examples, we will assume that
         mammal: {
             ninja: true,
             turtle: false,
-            dog: true
+            dog: true,
+            flying_squirrel: 'Yup'
         },
         reptile: {
             turtle: true,
             ninja: true || false,
-            lizard
-        }
+            lizard: truekk
+        },
+        flyingSquirrel: 'Yuuuuup!',
+        FLYING_SQUIRREL: true
     };
 
 `test.findKeyInTree('mammal')` would return `'mammal'`.
+
 `test.findKeyInTree('dog')` would return `['human.dog', 'mammal.dog']`.
+
 `test.findKeyInTree('Dog')` would return `false`.
-`test.findKeyInTree('Dog', false)` would return `['human.dog', 'mammal.dog']`.
-`test.findKeyInTree('lizard', true)` would return `'lizard'`.
+
+`test.findKeyInTree('flying_squirrel', { caseSensitive: false });` would return `'mammal.flying_squirrel'`
+
+`test.findKeyInTree('flying_squirrel', { caseSensitive: false, conventionAgnostic: true });` would return `['mammal.flying_squirrel', 'flyingSquirrel', 'FLYING_SQUIRREL']`
 
 Got it? Good.
